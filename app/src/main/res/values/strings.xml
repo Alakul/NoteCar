@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">NoteCar</string>
+    <string name="wybierz_date">Wybierz datę</string>
+    <string name="ustaw_date">Ustaw datę</string>
+
+    <string name="menu_add">Dodaj</string>
+    <string name="menu_add_list">Dodaj z listy</string>
+
+    <string name="menu_sort">Sortuj</string>
+    <string name="menu_delete">Usuń</string>
+    <string name="menu_clear">Wyczyść</string>
+
+    <string name="osoba">Osoba</string>
+    <string name="miejsce">Miejsce</string>
+    <string name="godzina">Godzina</string>
+    <string name="data">Data</string>
+
+    <string name="anuluj">Anuluj</string>
+    <string name="dodaj">Dodaj</string>
+    <string name="edytuj">Edytuj</string>
+
+    <string name="godzina_button">Godzina</string>
+
+    <string name="dodaj_do_listy">Dodaj do listy</string>
+
+    <string name="logo">Logo</string>
+</resources>

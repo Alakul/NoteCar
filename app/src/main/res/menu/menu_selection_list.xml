@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/menuPlus"
+        android:icon="@drawable/ic_dodaj"
+        android:title="@string/menu_add"
+        app:showAsAction="ifRoom"/>
+
+    <item android:id="@+id/menuDel"
+        android:title="@string/menu_delete"
+        android:icon="@drawable/ic_usun"
+        app:showAsAction="ifRoom"/>
+</menu>
