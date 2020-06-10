@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.Cursor;
+import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -59,29 +61,82 @@ public class DatabaseHelper extends SQLiteOpenHelper
         onCreate(db);
     }
 
-    public void insertData(String date, String time, String person, String place)
+    public boolean insertData(String date, String time, String person, String place)
     {
-        ContentValues contentValues=new ContentValues();
-        contentValues.put(COLUMN_DATE, date);
-        contentValues.put(COLUMN_TIME, time);
-        contentValues.put(COLUMN_PERSON, person);
-        contentValues.put(COLUMN_PLACE, place);
-
         db=this.getWritableDatabase();
-        db.insert(TABLE_DATA,null,contentValues);
-        db.close();
+        Cursor cursor = db.rawQuery("SELECT * FROM "+ TABLE_DATA + " WHERE "+ COLUMN_DATE+ "=? AND "+ COLUMN_TIME +"= ? AND "+ COLUMN_PERSON +"= ? AND "+ COLUMN_PLACE+"= ?", new String[]{String.valueOf(date), String.valueOf(time), String.valueOf(person), String.valueOf(place)});
+
+        if (cursor.getCount() == 0) {
+
+            ContentValues contentValues=new ContentValues();
+            contentValues.put(COLUMN_DATE, date);
+            contentValues.put(COLUMN_TIME, time);
+            contentValues.put(COLUMN_PERSON, person);
+            contentValues.put(COLUMN_PLACE, place);
+
+            db=this.getWritableDatabase();
+            db.insert(TABLE_DATA,null,contentValues);
+            db.close();
+
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
-    public void insertList(String time, String person, String place)
+    public boolean insertList(String time, String person, String place)
     {
-        ContentValues contentValues=new ContentValues();
-        contentValues.put(COLUMN_TIME, time);
-        contentValues.put(COLUMN_PERSON, person);
-        contentValues.put(COLUMN_PLACE, place);
-
         db=this.getWritableDatabase();
-        db.insert(TABLE_LIST,null,contentValues);
-        db.close();
+        Cursor cursor = db.rawQuery("SELECT * FROM "+ TABLE_LIST + " WHERE "+ COLUMN_TIME +"= ? AND "+ COLUMN_PERSON +"= ? AND "+ COLUMN_PLACE+"= ?", new String[]{String.valueOf(time), String.valueOf(person), String.valueOf(place)});
+
+        if (cursor.getCount() == 0) {
+
+            ContentValues contentValues=new ContentValues();
+            contentValues.put(COLUMN_TIME, time);
+            contentValues.put(COLUMN_PERSON, person);
+            contentValues.put(COLUMN_PLACE, place);
+
+            db=this.getWritableDatabase();
+            db.insert(TABLE_LIST,null,contentValues);
+            db.close();
+
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    public boolean insertToData(int id, String displayDate)
+    {
+        db=this.getWritableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM "+ TABLE_LIST + " WHERE "+ COLUMN_ID +"= ?", new String[]{String.valueOf(id)});
+
+        if (cursor.moveToFirst())
+        {
+            String time = cursor.getString(1);
+            String person = cursor.getString(2);
+            String place = cursor.getString(3);
+
+            Cursor row = db.rawQuery("SELECT * FROM "+ TABLE_DATA + " WHERE "+ COLUMN_TIME +"= ? AND "+ COLUMN_PERSON +"= ? AND "+ COLUMN_PLACE+"= ?", new String[]{String.valueOf(time), String.valueOf(person), String.valueOf(place)});
+            if (row.getCount() == 0){
+                ContentValues contentValues=new ContentValues();
+                contentValues.put(COLUMN_DATE, displayDate);
+                contentValues.put(COLUMN_TIME, time);
+                contentValues.put(COLUMN_PERSON, person);
+                contentValues.put(COLUMN_PLACE, place);
+
+                db.insert(TABLE_DATA,null,contentValues);
+                db.close();
+
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        return false;
     }
 
     public void updateData(int id, String date, String time, String person, String place)

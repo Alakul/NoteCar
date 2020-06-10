@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.DatePicker;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -19,6 +20,7 @@ import java.util.Calendar;
 public class List extends AppCompatActivity {
 
     private TextView displayDate;
+    private String displayDateList;
     private DatabaseHelper databaseHelper;
     private ListView listView;
     private AdapterList adapterList;
@@ -36,6 +38,8 @@ public class List extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         final String date = getIntent().getStringExtra("DATE");
+        displayDate = findViewById(R.id.dateChoiceValue);
+        displayDate.setText(date);
 
         listView=findViewById(R.id.listView);
         listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
@@ -48,19 +52,17 @@ public class List extends AppCompatActivity {
                 ListTable listTable=arrayList.get(position);
                 int id1=listTable.getId();
 
-                if (checked)
-                {
+                if (checked) {
                     adapterList.itemsSelected.add(id1);
                 }
-                else
-                {
+                else {
                     adapterList.itemsSelected.remove(id);
                 }
             }
 
             @Override
             public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-                mode.getMenuInflater().inflate(R.menu.menu_selection, menu);
+                mode.getMenuInflater().inflate(R.menu.menu_selection_list, menu);
                 return true;
             }
 
@@ -85,9 +87,17 @@ public class List extends AppCompatActivity {
 
                     case R.id.menuPlus:
                         selectedItemPositions = adapterList.itemsSelected;
+                        int added = 0;
+                        int sum = selectedItemPositions.size();
                         for (int i = selectedItemPositions.size() - 1; i >= 0; i--) {
+                            displayDateList=displayDate.getText().toString();
 
+                            if (databaseHelper.insertToData(selectedItemPositions.get(i), displayDateList)){
+                                added++;
+                            }
                         }
+                        Toast.makeText(getApplicationContext(), "Dodano "+added+" z "+ sum, Toast.LENGTH_SHORT).show();
+
                         mode.finish();
                         return true;
 
@@ -102,9 +112,6 @@ public class List extends AppCompatActivity {
             }
         });
 
-
-        displayDate = findViewById(R.id.dateChoiceValue);
-        displayDate.setText(date);
 
         findViewById(R.id.dateChoiceButton).setOnClickListener(new View.OnClickListener() {
             @Override

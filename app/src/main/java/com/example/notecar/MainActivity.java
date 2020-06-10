@@ -88,12 +88,10 @@ public class MainActivity extends AppCompatActivity{
                 DataTable dataTable=arrayList.get(position);
                 int id1=dataTable.getId();
 
-                if (checked)
-                {
+                if (checked) {
                     adapterData.itemsSelected.add(id1);
                 }
-                else
-                {
+                else {
                     adapterData.itemsSelected.remove(id);
                 }
             }
@@ -111,7 +109,6 @@ public class MainActivity extends AppCompatActivity{
 
             @Override
             public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-
                 switch (item.getItemId()) {
                     case R.id.menuDel:
                         ArrayList<Integer> selectedItemPositions = adapterData.itemsSelected;
