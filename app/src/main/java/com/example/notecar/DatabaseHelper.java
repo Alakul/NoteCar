@@ -30,14 +30,12 @@ public class DatabaseHelper extends SQLiteOpenHelper
     SQLiteDatabase db;
     //Context c;
 
-    public DatabaseHelper(Context context)
-    {
+    public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION );
         this.context=context;
     }
 
-    public void onCreate(SQLiteDatabase db)
-    {
+    public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_DATA + " (" +
                 COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COLUMN_DATE + " TEXT NOT NULL, " +
@@ -52,8 +50,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
                 COLUMN_PLACE + " TEXT NOT NULL )");
     }
 
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
-    {
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS "+TABLE_DATA);
         onCreate(db);
 
@@ -61,8 +58,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
         onCreate(db);
     }
 
-    public boolean insertData(String date, String time, String person, String place)
-    {
+    public boolean insertData(String date, String time, String person, String place) {
         db=this.getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM "+ TABLE_DATA + " WHERE "+ COLUMN_DATE+ "=? AND "+ COLUMN_TIME +"= ? AND "+ COLUMN_PERSON +"= ? AND "+ COLUMN_PLACE+"= ?", new String[]{String.valueOf(date), String.valueOf(time), String.valueOf(person), String.valueOf(place)});
 
@@ -85,13 +81,11 @@ public class DatabaseHelper extends SQLiteOpenHelper
         }
     }
 
-    public boolean insertList(String time, String person, String place)
-    {
+    public boolean insertList(String time, String person, String place) {
         db=this.getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM "+ TABLE_LIST + " WHERE "+ COLUMN_TIME +"= ? AND "+ COLUMN_PERSON +"= ? AND "+ COLUMN_PLACE+"= ?", new String[]{String.valueOf(time), String.valueOf(person), String.valueOf(place)});
 
         if (cursor.getCount() == 0) {
-
             ContentValues contentValues=new ContentValues();
             contentValues.put(COLUMN_TIME, time);
             contentValues.put(COLUMN_PERSON, person);
@@ -108,18 +102,16 @@ public class DatabaseHelper extends SQLiteOpenHelper
         }
     }
 
-    public boolean insertToData(int id, String displayDate)
-    {
+    public boolean insertToData(int id, String displayDate) {
         db=this.getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM "+ TABLE_LIST + " WHERE "+ COLUMN_ID +"= ?", new String[]{String.valueOf(id)});
 
-        if (cursor.moveToFirst())
-        {
+        if (cursor.moveToFirst()) {
             String time = cursor.getString(1);
             String person = cursor.getString(2);
             String place = cursor.getString(3);
 
-            Cursor row = db.rawQuery("SELECT * FROM "+ TABLE_DATA + " WHERE "+ COLUMN_TIME +"= ? AND "+ COLUMN_PERSON +"= ? AND "+ COLUMN_PLACE+"= ?", new String[]{String.valueOf(time), String.valueOf(person), String.valueOf(place)});
+            Cursor row = db.rawQuery("SELECT * FROM "+ TABLE_DATA + " WHERE "+ COLUMN_DATE +"= ? AND "+ COLUMN_TIME +"= ? AND "+ COLUMN_PERSON +"= ? AND "+ COLUMN_PLACE+"= ?", new String[]{String.valueOf(displayDate), String.valueOf(time), String.valueOf(person), String.valueOf(place)});
             if (row.getCount() == 0){
                 ContentValues contentValues=new ContentValues();
                 contentValues.put(COLUMN_DATE, displayDate);
@@ -139,8 +131,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
         return false;
     }
 
-    public void updateData(int id, String date, String time, String person, String place)
-    {
+    public void updateData(int id, String date, String time, String person, String place) {
         db=this.getWritableDatabase();
         ContentValues values=new ContentValues();
         values.put(COLUMN_DATE, date);
@@ -152,32 +143,28 @@ public class DatabaseHelper extends SQLiteOpenHelper
         db.close();
     }
 
-    public void deleteData(int id)
-    {
+    public void deleteData(int id) {
         SQLiteDatabase db=this.getWritableDatabase();
         db.delete(TABLE_DATA, COLUMN_ID + "=?",  new String[]{String.valueOf(id)});
         db.close();
     }
 
-    public void deleteList(int id)
-    {
+    public void deleteList(int id) {
         SQLiteDatabase db=this.getWritableDatabase();
         db.delete(TABLE_LIST, COLUMN_ID + "=?",  new String[]{String.valueOf(id)});
         db.close();
     }
 
-    public ArrayList<DataTable> getAllData()
-    {
-        String sql;
+    public ArrayList<DataTable> getAllData(String datePicker) {
+       //String sql;
 
-        preferences = context.getSharedPreferences("preferences", 0);
-
+        //preferences = context.getSharedPreferences("preferences", 0);
         //SharedPreferences preferences = c.getSharedPreferences("preferences", Activity.MODE_PRIVATE);
-        int number = preferences.getInt("orderByData",0);
-
+        //int number = preferences.getInt("orderByData",0);
+/*
         if(number==0)
         {
-            sql = "SELECT * FROM " + TABLE_DATA + " ORDER BY " + COLUMN_TIME + " ASC";
+            sql = "SELECT * FROM " + TABLE_DATA + " WHERE "+ COLUMN_DATE + "=" + date + " ORDER BY " + COLUMN_TIME + " ASC";
         }
         else if(number==1)
         {
@@ -191,11 +178,11 @@ public class DatabaseHelper extends SQLiteOpenHelper
         {
             sql = "SELECT * FROM " + TABLE_DATA + " ORDER BY " + COLUMN_ID + " ASC";
         }
-
-        //sql = "SELECT * FROM " + TABLE_DATA;
+*/
+        //sql = "SELECT * FROM " + TABLE_DATA + " WHERE " + COLUMN_DATE + "=" + date1;
         SQLiteDatabase db = this.getReadableDatabase();
         ArrayList<DataTable> arrayList = new ArrayList<>();
-        Cursor cursor = db.rawQuery(sql, null);
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_DATA + " WHERE " + COLUMN_DATE + "=?", new String[]{datePicker});
 
         if (cursor.moveToFirst())
         {
@@ -216,8 +203,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
         return arrayList;
     }
 
-    public ArrayList<ListTable> getAllList()
-    {
+    public ArrayList<ListTable> getAllList() {
         String sql;
         /*
         if (0==0)
@@ -245,9 +231,8 @@ public class DatabaseHelper extends SQLiteOpenHelper
         ArrayList<ListTable> arrayList = new ArrayList<>();
         Cursor cursor = db.rawQuery(sql, null);
 
-        if (cursor.moveToFirst())
-        {
-            do{
+        if (cursor.moveToFirst()) {
+            do {
                 ListTable listTable=new ListTable();
 
                 listTable.setId((cursor.getInt(0)));
@@ -256,8 +241,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
                 listTable.setPlace((cursor.getString(3)));
 
                 arrayList.add(listTable);
-
-            }while(cursor.moveToNext());
+            } while(cursor.moveToNext());
         }
 
         return arrayList;

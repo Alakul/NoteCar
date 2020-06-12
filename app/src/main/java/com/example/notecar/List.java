@@ -3,6 +3,7 @@ package com.example.notecar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.view.ActionMode;
@@ -10,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.DatePicker;
+import android.content.DialogInterface;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -50,10 +52,10 @@ public class List extends AppCompatActivity {
                 mode.setTitle("Zaznaczono: "+ checkedCount);
 
                 ListTable listTable=arrayList.get(position);
-                int id1=listTable.getId();
+                int idAdd=listTable.getId();
 
                 if (checked) {
-                    adapterList.itemsSelected.add(id1);
+                    adapterList.itemsSelected.add(idAdd);
                 }
                 else {
                     adapterList.itemsSelected.remove(id);
@@ -78,17 +80,22 @@ public class List extends AppCompatActivity {
                 switch (item.getItemId()) {
                     case R.id.menuDel:
                         selectedItemPositions = adapterList.itemsSelected;
+                        int deleted = 0;
+                        int sumDel = selectedItemPositions.size();
                         for (int i = selectedItemPositions.size() - 1; i >= 0; i--) {
                             databaseHelper.deleteList(selectedItemPositions.get(i));
+                            deleted++;
                         }
                         onResume();
                         mode.finish();
+
+                        Toast.makeText(getApplicationContext(), "Usunięto "+deleted+" z "+ sumDel, Toast.LENGTH_SHORT).show();
                         return true;
 
                     case R.id.menuPlus:
                         selectedItemPositions = adapterList.itemsSelected;
                         int added = 0;
-                        int sum = selectedItemPositions.size();
+                        int sumAdd = selectedItemPositions.size();
                         for (int i = selectedItemPositions.size() - 1; i >= 0; i--) {
                             displayDateList=displayDate.getText().toString();
 
@@ -96,9 +103,9 @@ public class List extends AppCompatActivity {
                                 added++;
                             }
                         }
-                        Toast.makeText(getApplicationContext(), "Dodano "+added+" z "+ sum, Toast.LENGTH_SHORT).show();
-
                         mode.finish();
+
+                        Toast.makeText(getApplicationContext(), "Dodano "+added+" z "+ sumAdd, Toast.LENGTH_SHORT).show();
                         return true;
 
                     default:
@@ -149,10 +156,34 @@ public class List extends AppCompatActivity {
         datePickerDialog.show();
     }
 
-    private void viewData()
-    {
+    private void viewData() {
         arrayList=databaseHelper.getAllList();
         adapterList = new AdapterList(this,arrayList);
         listView.setAdapter(adapterList);
+    }
+
+    void showAlert(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Write your message here.");
+        builder.setCancelable(true);
+
+        builder.setPositiveButton(
+                "Yes",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+
+        builder.setNegativeButton(
+                "No",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 }

@@ -44,12 +44,16 @@ public class AdapterData extends BaseAdapter
         TextView person=view.findViewById(R.id.person_text);
         TextView time=view.findViewById(R.id.time_text);
         TextView place=view.findViewById(R.id.place_text);
+        TextView date=view.findViewById(R.id.date_text);
+        TextView id=view.findViewById(R.id.id_text);
 
         DataTable dataItem = (DataTable)getItem(position);
 
         person.setText(dataItem.getPerson());
         time.setText(dataItem.getTime());
         place.setText(dataItem.getPlace());
+        date.setText(dataItem.getDate());
+        id.setText(String.valueOf(dataItem.getId()));
 
         return view;
     }

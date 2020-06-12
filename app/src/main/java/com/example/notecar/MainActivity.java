@@ -42,8 +42,8 @@ public class MainActivity extends AppCompatActivity{
     SharedPreferences preferences;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
-                arrayList= databaseHelper.getAllData();
+                arrayList= databaseHelper.getAllData(displayDate.getText().toString());
                 DataTable dataTable=arrayList.get(position);
 
                 int id1=dataTable.getId();
@@ -85,11 +85,12 @@ public class MainActivity extends AppCompatActivity{
                 int checkedCount = listView.getCheckedItemCount();
                 mode.setTitle("Zaznaczono: "+ checkedCount);
 
+                arrayList= databaseHelper.getAllData(displayDate.getText().toString());
                 DataTable dataTable=arrayList.get(position);
-                int id1=dataTable.getId();
+                int idAdd=dataTable.getId();
 
                 if (checked) {
-                    adapterData.itemsSelected.add(id1);
+                    adapterData.itemsSelected.add(idAdd);
                 }
                 else {
                     adapterData.itemsSelected.remove(id);
@@ -112,13 +113,17 @@ public class MainActivity extends AppCompatActivity{
                 switch (item.getItemId()) {
                     case R.id.menuDel:
                         ArrayList<Integer> selectedItemPositions = adapterData.itemsSelected;
+                        int deleted = 0;
+                        int sumDel = selectedItemPositions.size();
                         for (int i = selectedItemPositions.size() - 1; i >= 0; i--) {
                             databaseHelper.deleteData(selectedItemPositions.get(i));
+                            deleted++;
                         }
                         onResume();
                         mode.finish();
-                        return true;
 
+                        Toast.makeText(getApplicationContext(), "Usunięto "+deleted+" z "+ sumDel, Toast.LENGTH_SHORT).show();
+                        return true;
                     default:
                         return false;
                 }
@@ -154,33 +159,36 @@ public class MainActivity extends AppCompatActivity{
         String formattedDate = simpleDateFormat.format(currentTime);
         displayDate.setText(formattedDate);
 
-        preferences = getSharedPreferences("preferences", 0);
+        savePreferences(year, month, day);
+
+    }
+
+    public void savePreferences(int year, int month, int day){
+        SharedPreferences preferences = this.getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putInt("year", year);
         editor.putInt("month", month);
         editor.putInt("day", day);
         editor.apply();
-
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        adapterData.swapItems(databaseHelper.getAllData());
+        adapterData.swapItems(databaseHelper.getAllData(displayDate.getText().toString()));
     }
 
     private void showDatePickerDialog()
     {
-        //final Calendar calendar=Calendar.getInstance();
-        //int year=calendar.get(Calendar.YEAR);
-        //int month=calendar.get(Calendar.MONTH);
-        //int day=calendar.get(Calendar.DAY_OF_MONTH);
+        final Calendar calendar=Calendar.getInstance();
+        int year=calendar.get(Calendar.YEAR);
+        int month=calendar.get(Calendar.MONTH);
+        int day=calendar.get(Calendar.DAY_OF_MONTH);
 
-
-        preferences = getSharedPreferences("preferences", 0);
-        int year = preferences.getInt("year", 0);
-        int month = preferences.getInt("month", 0);
-        int day= preferences.getInt("day", 0);
+        //preferences = getSharedPreferences("preferences", 0);
+        //int year = preferences.getInt("year", 0);
+        //int month = preferences.getInt("month", 0);
+        //int day= preferences.getInt("day", 0);
 
         //String[] values=value.split(".");
         //int year=Integer.parseInt(values[0]);
@@ -193,31 +201,24 @@ public class MainActivity extends AppCompatActivity{
 
                 //SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
                 //String formattedDate = simpleDateFormat.format(calendar.getTime());
-                String date=String.format("%02d.%02d.", day , (month+1))+year;
 
-                preferences = getSharedPreferences("preferences", 0);
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.putInt("year", year);
-                editor.putInt("month", month);
-                editor.putInt("day", day);
-                editor.apply();
+                String date=String.format("%02d.%02d.", day , (month+1))+year;
                 displayDate.setText(date);
+                adapterData.swapItems(databaseHelper.getAllData(displayDate.getText().toString()));
             }
         }, year, month, day);
         datePickerDialog.show();
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
+    public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_menu, menu);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
+    public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menuPlus:
                 add();
@@ -234,8 +235,7 @@ public class MainActivity extends AppCompatActivity{
         return true;
     }
 
-    void add()
-    {
+    void add() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         String[] choice = {"Nowy", "Z listy"};
 
@@ -257,8 +257,7 @@ public class MainActivity extends AppCompatActivity{
         dialog.show();
     }
 
-    void sort()
-    {
+    void sort() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         String[] choice = {"Data dodania", "Godzina", "Osoba", "Miejsce"};
 
@@ -286,36 +285,32 @@ public class MainActivity extends AppCompatActivity{
         dialog.show();
     }
 
-    void clear()
-    {
+    void clear() {
         Toast.makeText(this, "Działa", Toast.LENGTH_SHORT).show();
     }
 
-    void addNew()
-    {
+    void addNew() {
         String date=displayDate.getText().toString();
         Intent intent = new Intent(getBaseContext(), Add.class);
         intent.putExtra("DATE", date);
         startActivity(intent);
     }
 
-    void addList()
-    {
+    void addList() {
         String date=displayDate.getText().toString();
         Intent intent = new Intent(getBaseContext(), List.class);
         intent.putExtra("DATE", date);
         startActivity(intent);
     }
 
-    private void viewData()
-    {
-        arrayList= databaseHelper.getAllData();
+    private void viewData() {
+        arrayList= databaseHelper.getAllData(displayDate.getText().toString());
+
         adapterData = new AdapterData(this,arrayList);
         listView.setAdapter(adapterData);
     }
 
-    void timeOrder()
-    {
+    void timeOrder() {
         preferences = getSharedPreferences("preferences", 0);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putInt("orderByData", 0);
@@ -327,26 +322,24 @@ public class MainActivity extends AppCompatActivity{
         //editor.apply();
     }
 
-    void personOrder()
-    {
+    void personOrder() {
         preferences = getSharedPreferences("preferences", 0);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putInt("orderByData", 1);
         editor.apply();
-        adapterData.swapItems(databaseHelper.getAllData());
+
+        adapterData.swapItems(databaseHelper.getAllData(displayDate.getText().toString()));
         Toast.makeText(this, "Działa", Toast.LENGTH_SHORT).show();
     }
 
-    void placeOrder()
-    {
+    void placeOrder() {
         preferences = getSharedPreferences("preferences", 0);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putInt("orderByData", 2);
         editor.apply();
     }
 
-    void idOrder()
-    {
+    void idOrder() {
         preferences = getSharedPreferences("preferences",0);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putInt("orderByData", 3);
