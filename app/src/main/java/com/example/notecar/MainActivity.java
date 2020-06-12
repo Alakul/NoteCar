@@ -6,6 +6,8 @@ import androidx.appcompat.widget.Toolbar;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.ActionMode;
 import android.view.Menu;
@@ -28,6 +30,11 @@ import java.util.Date;
 import java.util.Locale;
 
 import android.widget.Toast;
+
+import com.baoyz.swipemenulistview.SwipeMenu;
+import com.baoyz.swipemenulistview.SwipeMenuCreator;
+import com.baoyz.swipemenulistview.SwipeMenuItem;
+import com.baoyz.swipemenulistview.SwipeMenuListView;
 
 public class MainActivity extends AppCompatActivity{
 
@@ -90,8 +97,7 @@ public class MainActivity extends AppCompatActivity{
                 int idAdd=dataTable.getId();
 
                 if (checked) {
-                    adapterData.itemsSelected.add(idAdd);
-                }
+                    adapterData.itemsSelected.add(idAdd); }
                 else {
                     adapterData.itemsSelected.remove(id);
                 }
@@ -135,6 +141,55 @@ public class MainActivity extends AppCompatActivity{
             }
         });
 
+        SwipeMenuListView listView= findViewById(R.id.listView);
+        SwipeMenuCreator creator = new SwipeMenuCreator() {
+            @Override
+            public void create(SwipeMenu menu) {
+                // create "open" item
+                SwipeMenuItem openItem = new SwipeMenuItem(
+                        getApplicationContext());
+                // set item background
+                openItem.setBackground(new ColorDrawable(Color.parseColor("#2196F3")));
+                // set item width
+                openItem.setWidth(190);
+                // set item title
+                openItem.setTitle("Edytuj");
+                // set item title fontsize
+                openItem.setTitleSize(18);
+                // set item title font color
+                openItem.setTitleColor(Color.WHITE);
+                // add to menu
+                menu.addMenuItem(openItem);
+            }
+        };
+        listView.setMenuCreator(creator);
+
+        listView.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
+                if (index == 0) {
+                    arrayList= databaseHelper.getAllData(displayDate.getText().toString());
+                    DataTable dataTable=arrayList.get(position);
+
+                    int id=dataTable.getId();
+                    String date=dataTable.getDate();
+                    String time=dataTable.getTime();
+                    String person=dataTable.getPerson();
+                    String place=dataTable.getPlace();
+
+                    Intent intent = new Intent(getBaseContext(), Edit.class);
+                    intent.putExtra("ID", id);
+                    intent.putExtra("DATE", date);
+                    intent.putExtra("TIME", time);
+                    intent.putExtra("PERSON", person);
+                    intent.putExtra("PLACE", place);
+                    startActivity(intent);
+                }
+                return false;
+            }
+        });
+
+
         displayDate = findViewById(R.id.dateChoiceValue);
         findViewById(R.id.dateChoiceButton).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -160,7 +215,6 @@ public class MainActivity extends AppCompatActivity{
         displayDate.setText(formattedDate);
 
         savePreferences(year, month, day);
-
     }
 
     public void savePreferences(int year, int month, int day){

@@ -85,8 +85,7 @@ public class Add extends AppCompatActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem menuItem)
-    {
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
         int id= menuItem.getItemId();
         if (id==android.R.id.home) {
             this.finish();
@@ -94,8 +93,7 @@ public class Add extends AppCompatActivity {
         return super.onOptionsItemSelected(menuItem);
     }
 
-    private void showTimePickerDialog()
-    {
+    private void showTimePickerDialog() {
         TimePickerDialog timePickerDialog = new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker timePicker, int hour, int minute) {
@@ -106,8 +104,7 @@ public class Add extends AppCompatActivity {
         timePickerDialog.show();
     }
 
-    private void showDatePickerDialog()
-    {
+    private void showDatePickerDialog() {
         Calendar calendar=Calendar.getInstance();
         int year=calendar.get(Calendar.YEAR);
         int month=calendar.get(Calendar.MONTH);
@@ -125,24 +122,14 @@ public class Add extends AppCompatActivity {
         datePickerDialog.show();
     }
 
-    private void showAlertDialogEmpty()
-    {
+    private void showAlertDialogEmpty() {
         AlertDialog.Builder alert=new AlertDialog.Builder(this);
         alert.setMessage("Wypełnij wszystkie pola!");
         alert.setPositiveButton("OK", null);
         alert.show();
     }
 
-    private void showAlertDialogExist()
-    {
-        AlertDialog.Builder alert=new AlertDialog.Builder(this);
-        alert.setMessage("Podane dane już istnieją!");
-        alert.setPositiveButton("OK", null);
-        alert.show();
-    }
-
-    private void addData()
-    {
+    private void addData() {
         String dateT = displayDate.getText().toString();
         String timeT = displayTime.getText().toString();
         String personT = person.getText().toString();
@@ -151,22 +138,19 @@ public class Add extends AppCompatActivity {
         if (databaseHelper.insertData(dateT, timeT, personT, placeT)) {
             person.getText().clear();
             place.getText().clear();
-            Toast.makeText(this, "Rekord dodany pomyślnie", Toast.LENGTH_SHORT).show();
-        }
+            Toast.makeText(this, "Rekord dodany pomyślnie", Toast.LENGTH_SHORT).show(); }
         else {
             Toast.makeText(this, "Rekord istnieje", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void addToList()
-    {
+    private void addToList() {
         String timeT = displayTime.getText().toString();
         String personT = person.getText().toString();
         String placeT = place.getText().toString();
 
         if (databaseHelper.insertList(timeT, personT, placeT)) {
-            Toast.makeText(this, "Dodano do listy", Toast.LENGTH_SHORT).show();
-        }
+            Toast.makeText(this, "Dodano do listy", Toast.LENGTH_SHORT).show(); }
         else {
             Toast.makeText(this, "Rekord istnieje", Toast.LENGTH_SHORT).show();
         }

@@ -38,18 +38,20 @@ public class Edit extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        String id = getIntent().getStringExtra("ID");
         String date = getIntent().getStringExtra("DATE");
         String time = getIntent().getStringExtra("TIME");
         String person = getIntent().getStringExtra("PERSON");
         String place = getIntent().getStringExtra("PLACE");
 
         personValue=findViewById(R.id.personValue);
+        personValue.setText(person);
         placeValue=findViewById(R.id.placeValue);
-
-        databaseHelper =new DatabaseHelper(this);
-
+        placeValue.setText(place);
         displayDate = findViewById(R.id.dateChoiceValue);
         displayDate.setText(date);
+
+        databaseHelper =new DatabaseHelper(this);
 
         findViewById(R.id.dateChoiceButton).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,36 +70,39 @@ public class Edit extends AppCompatActivity {
             }
         });
 
-        personValue.setText(person);
-        placeValue.setText(place);
-
         findViewById(R.id.editButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (personValue.length()==0 || placeValue.length()==0)
-                {
-                    showAlertDialog(); }
-                else
-                {
-                    editData(v);
+                if (personValue.length()==0 || placeValue.length()==0) {
+                    showAlertDialogEmpty(); }
+                else {
+                    editData();
+                }
+            }
+        });
+
+        findViewById(R.id.addToListButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (personValue.length()==0 || placeValue.length()==0) {
+                    showAlertDialogEmpty(); }
+                else {
+                    addToList();
                 }
             }
         });
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem menuItem)
-    {
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
         int id= menuItem.getItemId();
-        if (id==android.R.id.home)
-        {
+        if (id==android.R.id.home) {
             this.finish();
         }
         return super.onOptionsItemSelected(menuItem);
     }
 
-    private void showTimePickerDialog()
-    {
+    private void showTimePickerDialog() {
         TimePickerDialog timePickerDialog = new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker timePicker, int hour, int minute) {
@@ -108,8 +113,7 @@ public class Edit extends AppCompatActivity {
         timePickerDialog.show();
     }
 
-    private void showDatePickerDialog()
-    {
+    private void showDatePickerDialog() {
         Calendar calendar=Calendar.getInstance();
         int year=calendar.get(Calendar.YEAR);
         int month=calendar.get(Calendar.MONTH);
@@ -127,24 +131,33 @@ public class Edit extends AppCompatActivity {
         datePickerDialog.show();
     }
 
-    private void showAlertDialog()
-    {
+    private void showAlertDialogEmpty() {
         AlertDialog.Builder alert=new AlertDialog.Builder(this);
         alert.setMessage("Wypełnij wszystkie pola!");
         alert.setPositiveButton("OK", null);
         alert.show();
     }
 
-    private void editData(View v)
-    {
-        int idT=getIntent().getIntExtra("ID",0);
-        String dateT = displayDate.getText().toString();
+    private void editData() {
+        int idUpdate=getIntent().getIntExtra("ID",0);
+        String dateUpdate = displayDate.getText().toString();
+        String timeUpdate = displayTime.getText().toString();
+        String personUpdate = personValue.getText().toString();
+        String placeUpdate = placeValue.getText().toString();
+        databaseHelper.updateData(idUpdate, dateUpdate, timeUpdate, personUpdate, placeUpdate);
+
+        Toast.makeText(this, "Rekord edytowany pomyślnie", Toast.LENGTH_SHORT).show();
+    }
+
+    private void addToList() {
         String timeT = displayTime.getText().toString();
         String personT = personValue.getText().toString();
         String placeT = placeValue.getText().toString();
 
-        databaseHelper.updateData(idT, dateT, timeT, personT, placeT);
-
-        Toast.makeText(this, "Rekord edytowany pomyślnie", Toast.LENGTH_SHORT).show();
+        if (databaseHelper.insertList(timeT, personT, placeT)) {
+            Toast.makeText(this, "Dodano do listy", Toast.LENGTH_SHORT).show(); }
+        else {
+            Toast.makeText(this, "Rekord istnieje", Toast.LENGTH_SHORT).show();
+        }
     }
 }
