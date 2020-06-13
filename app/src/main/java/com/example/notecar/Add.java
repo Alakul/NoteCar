@@ -64,10 +64,12 @@ public class Add extends AppCompatActivity {
         findViewById(R.id.addButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (person.length()==0 || place.length()==0) {
+                String personTrim = person.getText().toString().trim();
+                String placeTrim = place.getText().toString().trim();
+                if (personTrim.length()==0 || placeTrim.length()==0) {
                     showAlertDialogEmpty(); }
                 else {
-                    addData();
+                    addData(personTrim, placeTrim);
                 }
             }
         });
@@ -75,10 +77,12 @@ public class Add extends AppCompatActivity {
         findViewById(R.id.addToListButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (person.length()==0 || place.length()==0) {
+                String personTrim = person.getText().toString().trim();
+                String placeTrim = place.getText().toString().trim();
+                if (personTrim.length()==0 || placeTrim.length()==0) {
                     showAlertDialogEmpty(); }
                 else {
-                    addToList();
+                    addToList(personTrim, placeTrim);
                 }
             }
         });
@@ -129,13 +133,11 @@ public class Add extends AppCompatActivity {
         alert.show();
     }
 
-    private void addData() {
+    private void addData(String personTrim, String placeTrim) {
         String dateT = displayDate.getText().toString();
         String timeT = displayTime.getText().toString();
-        String personT = person.getText().toString();
-        String placeT = place.getText().toString();
 
-        if (databaseHelper.insertData(dateT, timeT, personT, placeT)) {
+        if (databaseHelper.insertData(dateT, timeT, personTrim, placeTrim)) {
             person.getText().clear();
             place.getText().clear();
             Toast.makeText(this, "Rekord dodany pomyślnie", Toast.LENGTH_SHORT).show(); }
@@ -144,12 +146,10 @@ public class Add extends AppCompatActivity {
         }
     }
 
-    private void addToList() {
+    private void addToList(String personTrim, String placeTrim) {
         String timeT = displayTime.getText().toString();
-        String personT = person.getText().toString();
-        String placeT = place.getText().toString();
 
-        if (databaseHelper.insertList(timeT, personT, placeT)) {
+        if (databaseHelper.insertList(timeT, personTrim, placeTrim)) {
             Toast.makeText(this, "Dodano do listy", Toast.LENGTH_SHORT).show(); }
         else {
             Toast.makeText(this, "Rekord istnieje", Toast.LENGTH_SHORT).show();

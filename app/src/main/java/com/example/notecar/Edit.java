@@ -20,12 +20,10 @@ import java.util.Calendar;
 
 public class Edit extends AppCompatActivity {
 
-    EditText personValue, placeValue;
-
+    private EditText personValue, placeValue;
     private TimePickerDialog.OnTimeSetListener onTimeSetListener;
     private TextView displayDate;
     private TextView displayTime;
-    private Button displayDateButton;
     private DatabaseHelper databaseHelper;
 
     @Override
@@ -38,7 +36,6 @@ public class Edit extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        String id = getIntent().getStringExtra("ID");
         String date = getIntent().getStringExtra("DATE");
         String time = getIntent().getStringExtra("TIME");
         String person = getIntent().getStringExtra("PERSON");
@@ -73,10 +70,12 @@ public class Edit extends AppCompatActivity {
         findViewById(R.id.editButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (personValue.length()==0 || placeValue.length()==0) {
+                String personTrim = personValue.getText().toString().trim();
+                String placeTrim = placeValue.getText().toString().trim();
+                if (personTrim.length()==0 || placeTrim.length()==0) {
                     showAlertDialogEmpty(); }
                 else {
-                    editData();
+                    editData(personTrim, placeTrim);
                 }
             }
         });
@@ -84,10 +83,12 @@ public class Edit extends AppCompatActivity {
         findViewById(R.id.addToListButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (personValue.length()==0 || placeValue.length()==0) {
+                String personTrim = personValue.getText().toString().trim();
+                String placeTrim = placeValue.getText().toString().trim();
+                if (personTrim.length()==0 || placeTrim.length()==0) {
                     showAlertDialogEmpty(); }
                 else {
-                    addToList();
+                    addToList(personTrim, placeTrim);
                 }
             }
         });
@@ -138,23 +139,19 @@ public class Edit extends AppCompatActivity {
         alert.show();
     }
 
-    private void editData() {
+    private void editData(String personTrim, String placeTrim) {
         int idUpdate=getIntent().getIntExtra("ID",0);
         String dateUpdate = displayDate.getText().toString();
         String timeUpdate = displayTime.getText().toString();
-        String personUpdate = personValue.getText().toString();
-        String placeUpdate = placeValue.getText().toString();
-        databaseHelper.updateData(idUpdate, dateUpdate, timeUpdate, personUpdate, placeUpdate);
+        databaseHelper.updateData(idUpdate, dateUpdate, timeUpdate, personTrim, placeTrim);
 
         Toast.makeText(this, "Rekord edytowany pomyślnie", Toast.LENGTH_SHORT).show();
     }
 
-    private void addToList() {
+    private void addToList(String personTrim, String placeTrim) {
         String timeT = displayTime.getText().toString();
-        String personT = personValue.getText().toString();
-        String placeT = placeValue.getText().toString();
 
-        if (databaseHelper.insertList(timeT, personT, placeT)) {
+        if (databaseHelper.insertList(timeT, personTrim, placeTrim)) {
             Toast.makeText(this, "Dodano do listy", Toast.LENGTH_SHORT).show(); }
         else {
             Toast.makeText(this, "Rekord istnieje", Toast.LENGTH_SHORT).show();

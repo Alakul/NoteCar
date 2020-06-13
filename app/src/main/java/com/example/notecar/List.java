@@ -5,6 +5,11 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.ActionMode;
 import android.view.Menu;
@@ -15,6 +20,11 @@ import android.content.DialogInterface;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.baoyz.swipemenulistview.SwipeMenu;
+import com.baoyz.swipemenulistview.SwipeMenuCreator;
+import com.baoyz.swipemenulistview.SwipeMenuItem;
+import com.baoyz.swipemenulistview.SwipeMenuListView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -28,6 +38,7 @@ public class List extends AppCompatActivity {
     private AdapterList adapterList;
     private ArrayList<ListTable> arrayList;
 
+    int sortList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,8 +66,7 @@ public class List extends AppCompatActivity {
                 int idAdd=listTable.getId();
 
                 if (checked) {
-                    adapterList.itemsSelected.add(idAdd);
-                }
+                    adapterList.itemsSelected.add(idAdd); }
                 else {
                     adapterList.itemsSelected.remove(id);
                 }
@@ -119,6 +129,40 @@ public class List extends AppCompatActivity {
             }
         });
 
+        SwipeMenuListView listView= findViewById(R.id.listView);
+        SwipeMenuCreator creator = new SwipeMenuCreator() {
+            @Override
+            public void create(SwipeMenu menu) {
+                SwipeMenuItem openItem = new SwipeMenuItem(
+                        getApplicationContext());
+                openItem.setBackground(new ColorDrawable(Color.parseColor("#2196F3")));
+                openItem.setWidth(190);
+                openItem.setTitle("Edytuj");
+                openItem.setTitleSize(18);
+                openItem.setTitleColor(Color.WHITE);
+                menu.addMenuItem(openItem);
+            }
+        };
+        listView.setMenuCreator(creator);
+
+        listView.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
+                if (index == 0) {
+                    arrayList= databaseHelper.getAllList(sortList);
+                    ListTable listTable=arrayList.get(position);
+
+                    Intent intent = new Intent(getBaseContext(), EditList.class);
+                    intent.putExtra("ID", listTable.getId());
+                    intent.putExtra("TIME", listTable.getTime());
+                    intent.putExtra("PERSON", listTable.getPerson());
+                    intent.putExtra("PLACE", listTable.getPlace());
+                    startActivity(intent);
+                }
+                return false;
+            }
+        });
+
 
         findViewById(R.id.dateChoiceButton).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -130,12 +174,34 @@ public class List extends AppCompatActivity {
         databaseHelper=new DatabaseHelper(this);
         arrayList=new ArrayList<ListTable>();
         viewData();
+
+        sortList=0;
+    }
+
+    public void savePreferences(int sortList){
+        SharedPreferences preferences = getSharedPreferences("preferences", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt("sortList", sortList);
+        editor.apply();
+    }
+
+    public void getPreferences(){
+        SharedPreferences preferences = getSharedPreferences("preferences", Context.MODE_PRIVATE);
+        sortList = preferences.getInt("sortList", -1);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        savePreferences(sortList);
+        adapterList.swapItems(databaseHelper.getAllList(sortList));
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        adapterList.swapItems(databaseHelper.getAllList());
+        getPreferences();
+        adapterList.swapItems(databaseHelper.getAllList(sortList));
     }
 
     private void showDatePickerDialog()
@@ -157,33 +223,8 @@ public class List extends AppCompatActivity {
     }
 
     private void viewData() {
-        arrayList=databaseHelper.getAllList();
+        arrayList=databaseHelper.getAllList(sortList);
         adapterList = new AdapterList(this,arrayList);
         listView.setAdapter(adapterList);
-    }
-
-    void showAlert(){
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Write your message here.");
-        builder.setCancelable(true);
-
-        builder.setPositiveButton(
-                "Yes",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                });
-
-        builder.setNegativeButton(
-                "No",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                });
-
-        AlertDialog alert = builder.create();
-        alert.show();
     }
 }

@@ -74,6 +74,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
             db.insert(TABLE_DATA,null,contentValues);
             db.close();
 
+            cursor.close();
             return true;
         }
         else {
@@ -95,6 +96,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
             db.insert(TABLE_LIST,null,contentValues);
             db.close();
 
+            cursor.close();
             return true;
         }
         else {
@@ -122,12 +124,14 @@ public class DatabaseHelper extends SQLiteOpenHelper
                 db.insert(TABLE_DATA,null,contentValues);
                 db.close();
 
+                row.close();
                 return true;
             }
             else {
                 return false;
             }
         }
+        cursor.close();
         return false;
     }
 
@@ -143,6 +147,17 @@ public class DatabaseHelper extends SQLiteOpenHelper
         db.close();
     }
 
+    public void updateList(int id, String time, String person, String place) {
+        db=this.getWritableDatabase();
+        ContentValues values=new ContentValues();
+        values.put(COLUMN_TIME, time);
+        values.put(COLUMN_PERSON, person);
+        values.put(COLUMN_PLACE, place);
+
+        db.update(TABLE_LIST, values, COLUMN_ID + "=?", new String[]{String.valueOf(id)});
+        db.close();
+    }
+
     public void deleteData(int id) {
         SQLiteDatabase db=this.getWritableDatabase();
         db.delete(TABLE_DATA, COLUMN_ID + "=?",  new String[]{String.valueOf(id)});
@@ -155,40 +170,27 @@ public class DatabaseHelper extends SQLiteOpenHelper
         db.close();
     }
 
-    public ArrayList<DataTable> getAllData(String datePicker) {
-       //String sql;
-
-        //preferences = context.getSharedPreferences("preferences", 0);
-        //SharedPreferences preferences = c.getSharedPreferences("preferences", Activity.MODE_PRIVATE);
-        //int number = preferences.getInt("orderByData",0);
-/*
-        if(number==0)
-        {
-            sql = "SELECT * FROM " + TABLE_DATA + " WHERE "+ COLUMN_DATE + "=" + date + " ORDER BY " + COLUMN_TIME + " ASC";
-        }
-        else if(number==1)
-        {
-            sql = "SELECT * FROM " + TABLE_DATA + " ORDER BY " + COLUMN_PERSON + " ASC";
-        }
-        else if (number==2)
-        {
-            sql = "SELECT * FROM " + TABLE_DATA + " ORDER BY " + COLUMN_PLACE + " ASC";
-        }
-        else
-        {
-            sql = "SELECT * FROM " + TABLE_DATA + " ORDER BY " + COLUMN_ID + " ASC";
-        }
-*/
-        //sql = "SELECT * FROM " + TABLE_DATA + " WHERE " + COLUMN_DATE + "=" + date1;
+    public ArrayList<DataTable> getAllData(String datePicker, int sortData) {
+        Cursor cursor;
         SQLiteDatabase db = this.getReadableDatabase();
         ArrayList<DataTable> arrayList = new ArrayList<>();
-        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_DATA + " WHERE " + COLUMN_DATE + "=?", new String[]{datePicker});
 
-        if (cursor.moveToFirst())
-        {
+        if(sortData==0) {
+            cursor = db.rawQuery("SELECT * FROM " + TABLE_DATA + " WHERE " + COLUMN_DATE + "=?" + " ORDER BY " + COLUMN_ID + " ASC", new String[]{datePicker});
+        }
+        else if(sortData==1) {
+            cursor = db.rawQuery("SELECT * FROM " + TABLE_DATA + " WHERE " + COLUMN_DATE + "=?" + " ORDER BY " + COLUMN_TIME + " ASC", new String[]{datePicker});
+        }
+        else if (sortData==2) {
+            cursor = db.rawQuery("SELECT * FROM " + TABLE_DATA + " WHERE " + COLUMN_DATE + "=?" + " ORDER BY " + COLUMN_PERSON + " ASC", new String[]{datePicker});
+        }
+        else {
+            cursor = db.rawQuery("SELECT * FROM " + TABLE_DATA + " WHERE " + COLUMN_DATE + "=?" + " ORDER BY " + COLUMN_PLACE + " ASC", new String[]{datePicker});
+        }
+
+        if (cursor.moveToFirst()) {
             do{
                 DataTable dataTable=new DataTable();
-
                 dataTable.setId((cursor.getInt(0)));
                 dataTable.setDate(cursor.getString(1));
                 dataTable.setTime(cursor.getString(2));
@@ -197,44 +199,37 @@ public class DatabaseHelper extends SQLiteOpenHelper
 
                 arrayList.add(dataTable);
 
-            }while(cursor.moveToNext());
+            } while(cursor.moveToNext());
         }
-
+        cursor.close();
         return arrayList;
     }
 
-    public ArrayList<ListTable> getAllList() {
-        String sql;
-        /*
-        if (0==0)
-        {
-            sql = "SELECT * FROM " + TABLE_LIST + " ORDER BY " + COLUMN_TIME + " DESC";
-        }
-        else if(1==1)
-        {
-            sql = "SELECT * FROM " + TABLE_LIST + " ORDER BY " + COLUMN_PERSON + " DESC";
-        }
-        else if (2==2)
-        {
-            sql = "SELECT * FROM " + TABLE_LIST + " ORDER BY " + COLUMN_PLACE + " DESC";
-        }
-        else
-        {
-            sql = "SELECT * FROM " + TABLE_LIST + " ORDER BY " + COLUMN_ID + " DESC";
-        }
-
-         */
-
-
-        sql = "SELECT * FROM " + TABLE_LIST;
+    public ArrayList<ListTable> getAllList(int sortList) {
+        Cursor cursor;
         SQLiteDatabase db = this.getReadableDatabase();
         ArrayList<ListTable> arrayList = new ArrayList<>();
-        Cursor cursor = db.rawQuery(sql, null);
+
+        if(sortList==0) {
+            cursor = db.rawQuery("SELECT * FROM " + TABLE_LIST +" ORDER BY " + COLUMN_TIME + " ASC", null);
+        }
+        else if(sortList==1) {
+            cursor = db.rawQuery("SELECT * FROM " + TABLE_LIST +" ORDER BY " + COLUMN_PERSON + " ASC", null);
+        }
+        else if (sortList==2) {
+            cursor = db.rawQuery("SELECT * FROM " + TABLE_LIST +" ORDER BY " + COLUMN_PLACE + " ASC", null);
+        }
+        else {
+            cursor = db.rawQuery("SELECT * FROM " + TABLE_LIST +" ORDER BY " + COLUMN_ID + " ASC", null);
+        }
+
+        //SQLiteDatabase db = this.getReadableDatabase();
+        //ArrayList<ListTable> arrayList = new ArrayList<>();
+        //Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_LIST, null);
 
         if (cursor.moveToFirst()) {
             do {
                 ListTable listTable=new ListTable();
-
                 listTable.setId((cursor.getInt(0)));
                 listTable.setTime(cursor.getString(1));
                 listTable.setPerson(cursor.getString(2));
@@ -243,7 +238,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
                 arrayList.add(listTable);
             } while(cursor.moveToNext());
         }
-
+        cursor.close();
         return arrayList;
     }
 }

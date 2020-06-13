@@ -39,6 +39,9 @@ import com.baoyz.swipemenulistview.SwipeMenuListView;
 public class MainActivity extends AppCompatActivity{
 
     //private static final String ORDER_BY_DATA = "orderByData";
+    String date;
+    int sortData;
+
 
     private TextView displayDate;
     private DatabaseHelper databaseHelper;
@@ -64,21 +67,15 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
-                arrayList= databaseHelper.getAllData(displayDate.getText().toString());
+                arrayList= databaseHelper.getAllData(displayDate.getText().toString(), sortData);
                 DataTable dataTable=arrayList.get(position);
 
-                int id1=dataTable.getId();
-                String date=dataTable.getDate();
-                String time=dataTable.getTime();
-                String person=dataTable.getPerson();
-                String place=dataTable.getPlace();
-
                 Intent intent = new Intent(getBaseContext(), Edit.class);
-                intent.putExtra("ID", id1);
-                intent.putExtra("DATE", date);
-                intent.putExtra("TIME", time);
-                intent.putExtra("PERSON", person);
-                intent.putExtra("PLACE", place);
+                intent.putExtra("ID", dataTable.getId());
+                intent.putExtra("DATE", dataTable.getDate());
+                intent.putExtra("TIME", dataTable.getTime());
+                intent.putExtra("PERSON", dataTable.getPerson());
+                intent.putExtra("PLACE", dataTable.getPlace());
                 startActivity(intent);
 
                 return false;
@@ -92,7 +89,7 @@ public class MainActivity extends AppCompatActivity{
                 int checkedCount = listView.getCheckedItemCount();
                 mode.setTitle("Zaznaczono: "+ checkedCount);
 
-                arrayList= databaseHelper.getAllData(displayDate.getText().toString());
+                arrayList= databaseHelper.getAllData(displayDate.getText().toString(), sortData);
                 DataTable dataTable=arrayList.get(position);
                 int idAdd=dataTable.getId();
 
@@ -116,23 +113,21 @@ public class MainActivity extends AppCompatActivity{
 
             @Override
             public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.menuDel:
-                        ArrayList<Integer> selectedItemPositions = adapterData.itemsSelected;
-                        int deleted = 0;
-                        int sumDel = selectedItemPositions.size();
-                        for (int i = selectedItemPositions.size() - 1; i >= 0; i--) {
-                            databaseHelper.deleteData(selectedItemPositions.get(i));
-                            deleted++;
-                        }
-                        onResume();
-                        mode.finish();
+                if (item.getItemId() == R.id.menuDel) {
+                    ArrayList<Integer> selectedItemPositions = adapterData.itemsSelected;
+                    int deleted = 0;
+                    int sumDel = selectedItemPositions.size();
+                    for (int i = selectedItemPositions.size() - 1; i >= 0; i--) {
+                        databaseHelper.deleteData(selectedItemPositions.get(i));
+                        deleted++;
+                    }
+                    onResume();
+                    mode.finish();
 
-                        Toast.makeText(getApplicationContext(), "Usunięto "+deleted+" z "+ sumDel, Toast.LENGTH_SHORT).show();
-                        return true;
-                    default:
-                        return false;
+                    Toast.makeText(getApplicationContext(), "Usunięto " + deleted + " z " + sumDel, Toast.LENGTH_SHORT).show();
+                    return true;
                 }
+                return false;
             }
 
             @Override
@@ -145,20 +140,13 @@ public class MainActivity extends AppCompatActivity{
         SwipeMenuCreator creator = new SwipeMenuCreator() {
             @Override
             public void create(SwipeMenu menu) {
-                // create "open" item
                 SwipeMenuItem openItem = new SwipeMenuItem(
                         getApplicationContext());
-                // set item background
                 openItem.setBackground(new ColorDrawable(Color.parseColor("#2196F3")));
-                // set item width
                 openItem.setWidth(190);
-                // set item title
                 openItem.setTitle("Edytuj");
-                // set item title fontsize
                 openItem.setTitleSize(18);
-                // set item title font color
                 openItem.setTitleColor(Color.WHITE);
-                // add to menu
                 menu.addMenuItem(openItem);
             }
         };
@@ -168,21 +156,15 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
                 if (index == 0) {
-                    arrayList= databaseHelper.getAllData(displayDate.getText().toString());
+                    arrayList= databaseHelper.getAllData(displayDate.getText().toString(), sortData);
                     DataTable dataTable=arrayList.get(position);
 
-                    int id=dataTable.getId();
-                    String date=dataTable.getDate();
-                    String time=dataTable.getTime();
-                    String person=dataTable.getPerson();
-                    String place=dataTable.getPlace();
-
                     Intent intent = new Intent(getBaseContext(), Edit.class);
-                    intent.putExtra("ID", id);
-                    intent.putExtra("DATE", date);
-                    intent.putExtra("TIME", time);
-                    intent.putExtra("PERSON", person);
-                    intent.putExtra("PLACE", place);
+                    intent.putExtra("ID", dataTable.getId());
+                    intent.putExtra("DATE", dataTable.getDate());
+                    intent.putExtra("TIME", dataTable.getTime());
+                    intent.putExtra("PERSON", dataTable.getPerson());
+                    intent.putExtra("PLACE", dataTable.getPlace());
                     startActivity(intent);
                 }
                 return false;
@@ -203,62 +185,62 @@ public class MainActivity extends AppCompatActivity{
         viewData();
 
 
-
-        Calendar dateNow = Calendar.getInstance();
-        int year=dateNow.get(Calendar.YEAR);
-        int month=dateNow.get(Calendar.MONTH);
-        int day=dateNow.get(Calendar.DAY_OF_MONTH);
-
-        Date currentTime = Calendar.getInstance().getTime();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy",Locale.getDefault());
-        String formattedDate = simpleDateFormat.format(currentTime);
-        displayDate.setText(formattedDate);
-
-        savePreferences(year, month, day);
+        SharedPreferences sharedpreferences = getSharedPreferences("preferences", Context.MODE_PRIVATE);
+        if (sharedpreferences.contains(date)) {
+            displayDate.setText(sharedpreferences.getString("date", "")); }
+        else {
+            Date currentTime = Calendar.getInstance().getTime();
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy",Locale.getDefault());
+            String formattedDate = simpleDateFormat.format(currentTime);
+            displayDate.setText(formattedDate);
+        }
     }
 
-    public void savePreferences(int year, int month, int day){
-        SharedPreferences preferences = this.getPreferences(Context.MODE_PRIVATE);
+    public void savePreferences(String date, int sortData){
+        SharedPreferences preferences = getSharedPreferences("preferences", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("year", year);
-        editor.putInt("month", month);
-        editor.putInt("day", day);
+        editor.putString("date", date);
+        editor.putInt("sortData", sortData);
         editor.apply();
+    }
+
+    public void getPreferences(){
+        SharedPreferences preferences = getSharedPreferences("preferences", Context.MODE_PRIVATE);
+        date = preferences.getString("date", "");
+        sortData = preferences.getInt("sortData", -1);
+        displayDate.setText(date);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        savePreferences(displayDate.getText().toString(), sortData);
+        adapterData.swapItems(databaseHelper.getAllData(displayDate.getText().toString(), sortData));
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        adapterData.swapItems(databaseHelper.getAllData(displayDate.getText().toString()));
+        getPreferences();
+        adapterData.swapItems(databaseHelper.getAllData(displayDate.getText().toString(), sortData));
     }
 
-    private void showDatePickerDialog()
-    {
+    private void showDatePickerDialog() {
         final Calendar calendar=Calendar.getInstance();
         int year=calendar.get(Calendar.YEAR);
         int month=calendar.get(Calendar.MONTH);
         int day=calendar.get(Calendar.DAY_OF_MONTH);
 
-        //preferences = getSharedPreferences("preferences", 0);
-        //int year = preferences.getInt("year", 0);
-        //int month = preferences.getInt("month", 0);
-        //int day= preferences.getInt("day", 0);
-
-        //String[] values=value.split(".");
-        //int year=Integer.parseInt(values[0]);
-        //int month=Integer.parseInt(values[1]);
-        //int day=Integer.parseInt(values[2]);
-
         DatePickerDialog datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-
                 //SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
                 //String formattedDate = simpleDateFormat.format(calendar.getTime());
 
                 String date=String.format("%02d.%02d.", day , (month+1))+year;
                 displayDate.setText(date);
-                adapterData.swapItems(databaseHelper.getAllData(displayDate.getText().toString()));
+                savePreferences(date, sortData);
+                adapterData.swapItems(databaseHelper.getAllData(displayDate.getText().toString(),sortData));
             }
         }, year, month, day);
         datePickerDialog.show();
@@ -320,16 +302,20 @@ public class MainActivity extends AppCompatActivity{
             public void onClick(DialogInterface dialog, int which) {
                 switch (which) {
                     case 0:
-                        timeOrder();
+                        sortData = 0;
+                        setOrder(sortData);
                         break;
                     case 1:
-                        personOrder();
+                        sortData = 1;
+                        setOrder(sortData);
                         break;
                     case 2:
-                        placeOrder();
+                        sortData = 2;
+                        setOrder(sortData);
                         break;
                     case 3:
-                        idOrder();
+                        sortData = 3;
+                        setOrder(sortData);
                         break;
                 }
             }
@@ -358,46 +344,14 @@ public class MainActivity extends AppCompatActivity{
     }
 
     private void viewData() {
-        arrayList= databaseHelper.getAllData(displayDate.getText().toString());
-
+        arrayList= databaseHelper.getAllData(displayDate.getText().toString(), sortData);
         adapterData = new AdapterData(this,arrayList);
         listView.setAdapter(adapterData);
     }
 
-    void timeOrder() {
-        preferences = getSharedPreferences("preferences", 0);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("orderByData", 0);
-        editor.apply();
-
-
-        //SharedPreferences.Editor editor = preferences.edit();
-        //editor.putInt(ORDER_BY_DATA, 0);
-        //editor.apply();
-    }
-
-    void personOrder() {
-        preferences = getSharedPreferences("preferences", 0);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("orderByData", 1);
-        editor.apply();
-
-        adapterData.swapItems(databaseHelper.getAllData(displayDate.getText().toString()));
-        Toast.makeText(this, "Działa", Toast.LENGTH_SHORT).show();
-    }
-
-    void placeOrder() {
-        preferences = getSharedPreferences("preferences", 0);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("orderByData", 2);
-        editor.apply();
-    }
-
-    void idOrder() {
-        preferences = getSharedPreferences("preferences",0);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("orderByData", 3);
-        editor.apply();
+    void setOrder(int sortData){
+        savePreferences(displayDate.getText().toString(), sortData);
+        adapterData.swapItems(databaseHelper.getAllData(displayDate.getText().toString(), sortData));
     }
 }
 

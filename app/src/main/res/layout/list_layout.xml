@@ -40,19 +40,5 @@
             android:text="@string/godzina"
             android:gravity="center_vertical"
             android:textSize="20sp"/>
-        <TextView
-        android:id="@+id/date_text"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:text="@string/godzina"
-        android:gravity="center_vertical"
-        android:textSize="20sp"/>
-        <TextView
-            android:id="@+id/id_text"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="@string/godzina"
-            android:gravity="center_vertical"
-            android:textSize="20sp"/>
     </LinearLayout>
 </LinearLayout>
