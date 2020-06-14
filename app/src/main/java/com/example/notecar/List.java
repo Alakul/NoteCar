@@ -228,8 +228,8 @@ public class List extends AppCompatActivity {
     }
 
     void addList() {
-
-        
+        Intent intent = new Intent(getBaseContext(), AddList.class);
+        startActivity(intent);
     }
 
     void clear() {

@@ -255,6 +255,9 @@ public class MainActivity extends AppCompatActivity{
             case R.id.menuPlus:
                 add();
                 break;
+            case R.id.menuList:
+                showList();
+                break;
             case R.id.menuSort:
                 sort();
                 break;
@@ -268,25 +271,10 @@ public class MainActivity extends AppCompatActivity{
     }
 
     void add() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        String[] choice = {"Nowy", "Z listy"};
-
-        builder.setTitle("Dodaj rekord").setItems(choice, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case 0:
-                        addNew();
-                        break;
-                    case 1:
-                        addList();
-                        break;
-                }
-            }
-        });
-
-        AlertDialog dialog = builder.create();
-        dialog.show();
+        String date=displayDate.getText().toString();
+        Intent intent = new Intent(getBaseContext(), Add.class);
+        intent.putExtra("DATE", date);
+        startActivity(intent);
     }
 
     void sort() {
@@ -342,14 +330,7 @@ public class MainActivity extends AppCompatActivity{
         alert.show();
     }
 
-    void addNew() {
-        String date=displayDate.getText().toString();
-        Intent intent = new Intent(getBaseContext(), Add.class);
-        intent.putExtra("DATE", date);
-        startActivity(intent);
-    }
-
-    void addList() {
+    void showList() {
         String date=displayDate.getText().toString();
         Intent intent = new Intent(getBaseContext(), List.class);
         intent.putExtra("DATE", date);

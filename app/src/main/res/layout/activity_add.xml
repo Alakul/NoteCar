@@ -47,7 +47,7 @@
                         android:layout_gravity="center"
                         android:background="@drawable/button_style"
                         android:padding="14dp"
-                        android:text="@string/data"
+                        android:text="@string/date"
                         android:textColor="#000000" />
 
                     <TextView
@@ -68,7 +68,7 @@
                         android:layout_height="match_parent"
                         android:gravity="center"
                         android:layout_margin="10dp"
-                        android:text="@string/osoba"
+                        android:text="@string/person"
                         android:textSize="18sp"/>
 
                     <EditText
@@ -93,7 +93,7 @@
                         android:layout_gravity="center"
                         android:background="@drawable/button_style"
                         android:padding="14dp"
-                        android:text="@string/godzina"
+                        android:text="@string/hour"
                         android:textColor="#000000" />
 
                     <TextView
@@ -115,7 +115,7 @@
                         android:layout_height="match_parent"
                         android:gravity="center"
                         android:layout_margin="10dp"
-                        android:text="@string/miejsce"
+                        android:text="@string/place"
                         android:textSize="18sp"/>
 
                     <EditText
@@ -141,7 +141,7 @@
                 android:layout_gravity="center"
                 android:background="@drawable/button_style"
                 android:padding="14dp"
-                android:text="@string/dodaj_do_listy"
+                android:text="@string/add_to_list"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="6dp"/>
 
@@ -150,7 +150,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/button_style"
-                android:text="@string/dodaj"
+                android:text="@string/add"
                 android:layout_marginTop="10dp"/>
         </LinearLayout>
     </LinearLayout>

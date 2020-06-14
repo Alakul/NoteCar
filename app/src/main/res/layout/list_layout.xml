@@ -15,7 +15,7 @@
             android:id="@+id/person_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/osoba"
+            android:text="@string/person"
             android:textSize="18sp"
             android:layout_marginBottom="5dp"/>
 
@@ -23,7 +23,7 @@
             android:id="@+id/place_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/miejsce"
+            android:text="@string/place"
             android:textSize="14sp"
             android:layout_marginTop="5dp"/>
     </LinearLayout>
@@ -37,7 +37,7 @@
             android:id="@+id/time_text"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="@string/godzina"
+            android:text="@string/hour"
             android:gravity="center_vertical"
             android:textSize="20sp"/>
     </LinearLayout>

@@ -3,12 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item android:id="@+id/menuPlus"
-        android:icon="@drawable/ic_dodaj"
-        android:title="@string/menu_add"
+        android:icon="@drawable/ic_add"
+        android:title="@string/add"
         app:showAsAction="ifRoom"/>
 
     <item android:id="@+id/menuDel"
-        android:title="@string/menu_delete"
-        android:icon="@drawable/ic_usun"
+        android:title="@string/delete"
+        android:icon="@drawable/ic_delete"
         app:showAsAction="ifRoom"/>
 </menu>

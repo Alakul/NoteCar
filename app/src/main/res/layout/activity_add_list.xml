@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".EditList">
+    tools:context=".AddList">
 
     <androidx.appcompat.widget.Toolbar
         app:theme="@style/ToolBarStyle"
@@ -111,11 +111,11 @@
             android:orientation="vertical">
 
             <Button
-                android:id="@+id/editButton"
+                android:id="@+id/addToListButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/button_style"
-                android:text="@string/edit"
+                android:text="@string/add_to_list"
                 android:layout_marginTop="16dp"/>
         </LinearLayout>
     </LinearLayout>
