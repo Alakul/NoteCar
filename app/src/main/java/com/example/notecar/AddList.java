@@ -88,6 +88,8 @@ public class AddList extends AppCompatActivity {
         String timeT = displayTime.getText().toString();
 
         if (databaseHelper.insertList(timeT, personTrim, placeTrim)) {
+            person.getText().clear();
+            place.getText().clear();
             Toast.makeText(this, "Dodano do listy", Toast.LENGTH_SHORT).show(); }
         else {
             Toast.makeText(this, "Dane istnieją na liście", Toast.LENGTH_SHORT).show();

@@ -65,6 +65,7 @@ public class List extends AppCompatActivity {
                 int checkedCount = listView.getCheckedItemCount();
                 mode.setTitle("Zaznaczono: "+ checkedCount);
 
+                arrayList= databaseHelper.getAllList(sortList);
                 ListTable listTable=arrayList.get(position);
                 int idAdd=listTable.getId();
 
@@ -160,7 +161,7 @@ public class List extends AppCompatActivity {
                 SwipeMenuItem openItem = new SwipeMenuItem(
                         getApplicationContext());
                 openItem.setBackground(new ColorDrawable(Color.parseColor("#2196F3")));
-                openItem.setWidth(190);
+                openItem.setWidth(170);
                 openItem.setTitle("Edytuj");
                 openItem.setTitleSize(18);
                 openItem.setTitleColor(Color.WHITE);

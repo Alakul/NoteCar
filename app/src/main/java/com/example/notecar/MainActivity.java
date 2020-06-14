@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity{
                 SwipeMenuItem openItem = new SwipeMenuItem(
                         getApplicationContext());
                 openItem.setBackground(new ColorDrawable(Color.parseColor("#2196F3")));
-                openItem.setWidth(190);
+                openItem.setWidth(170);
                 openItem.setTitle("Edytuj");
                 openItem.setTitleSize(18);
                 openItem.setTitleColor(Color.WHITE);
