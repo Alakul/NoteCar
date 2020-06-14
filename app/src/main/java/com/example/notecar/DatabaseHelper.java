@@ -24,11 +24,8 @@ public class DatabaseHelper extends SQLiteOpenHelper
     private static final String COLUMN_PERSON ="person";
     private static final String COLUMN_PLACE ="place";
 
-    SharedPreferences preferences;
     Context context;
-
     SQLiteDatabase db;
-    //Context c;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION );
@@ -170,15 +167,27 @@ public class DatabaseHelper extends SQLiteOpenHelper
         db.close();
     }
 
+    public void deleteAllData(String datePicker){
+        SQLiteDatabase db=this.getWritableDatabase();
+        db.delete(TABLE_DATA, COLUMN_DATE + "=?", new String[]{datePicker});
+        db.close();
+    }
+
+    public void deleteAllList(){
+        SQLiteDatabase db=this.getWritableDatabase();
+        db.delete(TABLE_LIST, null,null);
+        db.close();
+    }
+
     public ArrayList<DataTable> getAllData(String datePicker, int sortData) {
         Cursor cursor;
         SQLiteDatabase db = this.getReadableDatabase();
         ArrayList<DataTable> arrayList = new ArrayList<>();
 
-        if(sortData==0) {
+        if (sortData==0) {
             cursor = db.rawQuery("SELECT * FROM " + TABLE_DATA + " WHERE " + COLUMN_DATE + "=?" + " ORDER BY " + COLUMN_ID + " ASC", new String[]{datePicker});
         }
-        else if(sortData==1) {
+        else if (sortData==1) {
             cursor = db.rawQuery("SELECT * FROM " + TABLE_DATA + " WHERE " + COLUMN_DATE + "=?" + " ORDER BY " + COLUMN_TIME + " ASC", new String[]{datePicker});
         }
         else if (sortData==2) {
@@ -210,22 +219,18 @@ public class DatabaseHelper extends SQLiteOpenHelper
         SQLiteDatabase db = this.getReadableDatabase();
         ArrayList<ListTable> arrayList = new ArrayList<>();
 
-        if(sortList==0) {
-            cursor = db.rawQuery("SELECT * FROM " + TABLE_LIST +" ORDER BY " + COLUMN_TIME + " ASC", null);
-        }
-        else if(sortList==1) {
-            cursor = db.rawQuery("SELECT * FROM " + TABLE_LIST +" ORDER BY " + COLUMN_PERSON + " ASC", null);
-        }
-        else if (sortList==2) {
-            cursor = db.rawQuery("SELECT * FROM " + TABLE_LIST +" ORDER BY " + COLUMN_PLACE + " ASC", null);
-        }
-        else {
+        if (sortList==0) {
             cursor = db.rawQuery("SELECT * FROM " + TABLE_LIST +" ORDER BY " + COLUMN_ID + " ASC", null);
         }
-
-        //SQLiteDatabase db = this.getReadableDatabase();
-        //ArrayList<ListTable> arrayList = new ArrayList<>();
-        //Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_LIST, null);
+        else if (sortList==1) {
+            cursor = db.rawQuery("SELECT * FROM " + TABLE_LIST +" ORDER BY " + COLUMN_TIME + " ASC", null);
+        }
+        else if (sortList==2) {
+            cursor = db.rawQuery("SELECT * FROM " + TABLE_LIST +" ORDER BY " + COLUMN_PERSON + " ASC", null);
+        }
+        else {
+            cursor = db.rawQuery("SELECT * FROM " + TABLE_LIST +" ORDER BY " + COLUMN_PLACE + " ASC", null);
+        }
 
         if (cursor.moveToFirst()) {
             do {

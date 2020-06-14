@@ -16,7 +16,9 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 
 public class Edit extends AppCompatActivity {
 
@@ -115,7 +117,7 @@ public class Edit extends AppCompatActivity {
     }
 
     private void showDatePickerDialog() {
-        Calendar calendar=Calendar.getInstance();
+        final Calendar calendar=Calendar.getInstance();
         int year=calendar.get(Calendar.YEAR);
         int month=calendar.get(Calendar.MONTH);
         int day=calendar.get(Calendar.DAY_OF_MONTH);
@@ -123,10 +125,11 @@ public class Edit extends AppCompatActivity {
         DatePickerDialog datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-                String date=String.format("%02d.%02d.", day , (month+1))+year;
-                //SimpleDateFormat dateFormatter = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
-                //String date=dateFormatter.format(new Date());
-                displayDate.setText(date);
+                calendar.set(year, month, day);
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
+                String formattedDate = simpleDateFormat.format(calendar.getTime());
+
+                displayDate.setText(formattedDate);
             }
         }, year, month, day);
         datePickerDialog.show();

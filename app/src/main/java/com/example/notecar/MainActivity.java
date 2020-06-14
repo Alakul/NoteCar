@@ -38,10 +38,8 @@ import com.baoyz.swipemenulistview.SwipeMenuListView;
 
 public class MainActivity extends AppCompatActivity{
 
-    //private static final String ORDER_BY_DATA = "orderByData";
-    String date;
-    int sortData;
-
+    private String date;
+    private int sortData;
 
     private TextView displayDate;
     private DatabaseHelper databaseHelper;
@@ -59,8 +57,6 @@ public class MainActivity extends AppCompatActivity{
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        //preferences = getSharedPreferences("preferences", Activity.MODE_PRIVATE);
 
         listView=findViewById(R.id.listView);
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -196,7 +192,7 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
-    public void savePreferences(String date, int sortData){
+    public void savePreferences(String date){
         SharedPreferences preferences = getSharedPreferences("preferences", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("date", date);
@@ -214,7 +210,7 @@ public class MainActivity extends AppCompatActivity{
     @Override
     public void onPause() {
         super.onPause();
-        savePreferences(displayDate.getText().toString(), sortData);
+        savePreferences(displayDate.getText().toString());
         adapterData.swapItems(databaseHelper.getAllData(displayDate.getText().toString(), sortData));
     }
 
@@ -234,12 +230,12 @@ public class MainActivity extends AppCompatActivity{
         DatePickerDialog datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-                //SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
-                //String formattedDate = simpleDateFormat.format(calendar.getTime());
+                calendar.set(year, month, day);
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
+                String formattedDate = simpleDateFormat.format(calendar.getTime());
 
-                String date=String.format("%02d.%02d.", day , (month+1))+year;
-                displayDate.setText(date);
-                savePreferences(date, sortData);
+                displayDate.setText(formattedDate);
+                savePreferences(formattedDate);
                 adapterData.swapItems(databaseHelper.getAllData(displayDate.getText().toString(),sortData));
             }
         }, year, month, day);
@@ -303,21 +299,18 @@ public class MainActivity extends AppCompatActivity{
                 switch (which) {
                     case 0:
                         sortData = 0;
-                        setOrder(sortData);
                         break;
                     case 1:
                         sortData = 1;
-                        setOrder(sortData);
                         break;
                     case 2:
                         sortData = 2;
-                        setOrder(sortData);
                         break;
                     case 3:
                         sortData = 3;
-                        setOrder(sortData);
                         break;
                 }
+                setOrder();
             }
         });
 
@@ -326,7 +319,27 @@ public class MainActivity extends AppCompatActivity{
     }
 
     void clear() {
-        Toast.makeText(this, "Działa", Toast.LENGTH_SHORT).show();
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Czy na pewno chcesz usunąć wszystkie rekordy ze strony?");
+        builder.setCancelable(true);
+
+        builder.setPositiveButton("Tak",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        databaseHelper.deleteAllData(displayDate.getText().toString());
+                        adapterData.swapItems(databaseHelper.getAllData(displayDate.getText().toString(), sortData));
+                    }
+                });
+
+        builder.setNegativeButton("Anuluj",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 
     void addNew() {
@@ -349,8 +362,8 @@ public class MainActivity extends AppCompatActivity{
         listView.setAdapter(adapterData);
     }
 
-    void setOrder(int sortData){
-        savePreferences(displayDate.getText().toString(), sortData);
+    void setOrder(){
+        savePreferences(displayDate.getText().toString());
         adapterData.swapItems(databaseHelper.getAllData(displayDate.getText().toString(), sortData));
     }
 }

@@ -13,6 +13,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.ActionMode;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.DatePicker;
@@ -26,8 +27,10 @@ import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Locale;
 
 public class List extends AppCompatActivity {
 
@@ -84,22 +87,43 @@ public class List extends AppCompatActivity {
             }
 
             @Override
-            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            public boolean onActionItemClicked(final ActionMode mode, MenuItem item) {
 
-                ArrayList<Integer> selectedItemPositions;
+                final ArrayList<Integer> selectedItemPositions;
                 switch (item.getItemId()) {
                     case R.id.menuDel:
                         selectedItemPositions = adapterList.itemsSelected;
-                        int deleted = 0;
-                        int sumDel = selectedItemPositions.size();
-                        for (int i = selectedItemPositions.size() - 1; i >= 0; i--) {
-                            databaseHelper.deleteList(selectedItemPositions.get(i));
-                            deleted++;
-                        }
-                        onResume();
-                        mode.finish();
 
-                        Toast.makeText(getApplicationContext(), "Usunięto "+deleted+" z "+ sumDel, Toast.LENGTH_SHORT).show();
+                        AlertDialog.Builder builder = new AlertDialog.Builder(List.this);
+                        builder.setMessage("Czy na pewno chcesz usunąć zaznaczone rekordy?");
+                        builder.setCancelable(true);
+
+                        builder.setPositiveButton("Tak",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        int deleted = 0;
+                                        int sumDel = selectedItemPositions.size();
+                                        for (int i = selectedItemPositions.size() - 1; i >= 0; i--) {
+                                            databaseHelper.deleteList(selectedItemPositions.get(i));
+                                            deleted++;
+                                        }
+                                        onResume();
+                                        mode.finish();
+
+                                        Toast.makeText(getApplicationContext(), "Usunięto "+deleted+" z "+ sumDel, Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+
+                        builder.setNegativeButton("Anuluj",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                });
+
+                        AlertDialog alert = builder.create();
+                        alert.show();
+
                         return true;
 
                     case R.id.menuPlus:
@@ -178,7 +202,61 @@ public class List extends AppCompatActivity {
         sortList=0;
     }
 
-    public void savePreferences(int sortList){
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_list, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menuPlus:
+                addList();
+                break;
+            case R.id.menuSort:
+                sort();
+                break;
+            case R.id.menuClear:
+                clear();
+                break;
+            default:
+                return false;
+        }
+        return true;
+    }
+
+    void addList() {
+
+        
+    }
+
+    void clear() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Czy na pewno chcesz usunąć wszystkie rekordy?");
+        builder.setCancelable(true);
+
+        builder.setPositiveButton("Tak",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        databaseHelper.deleteAllList();
+                        adapterList.swapItems(databaseHelper.getAllList(sortList));
+                    }
+                });
+
+        builder.setNegativeButton("Anuluj",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    public void savePreferences(){
         SharedPreferences preferences = getSharedPreferences("preferences", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putInt("sortList", sortList);
@@ -193,7 +271,7 @@ public class List extends AppCompatActivity {
     @Override
     public void onPause() {
         super.onPause();
-        savePreferences(sortList);
+        savePreferences();
         adapterList.swapItems(databaseHelper.getAllList(sortList));
     }
 
@@ -206,7 +284,7 @@ public class List extends AppCompatActivity {
 
     private void showDatePickerDialog()
     {
-        Calendar calendar=Calendar.getInstance();
+        final Calendar calendar=Calendar.getInstance();
         int year=calendar.get(Calendar.YEAR);
         int month=calendar.get(Calendar.MONTH);
         int day=calendar.get(Calendar.DAY_OF_MONTH);
@@ -214,9 +292,11 @@ public class List extends AppCompatActivity {
         DatePickerDialog datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-                //SimpleDateFormat dateFormatter = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
-                String date=String.format("%02d.%02d.", day , (month+1))+year;
-                displayDate.setText(date);
+                calendar.set(year, month, day);
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
+                String formattedDate = simpleDateFormat.format(calendar.getTime());
+
+                displayDate.setText(formattedDate);
             }
         }, year, month, day);
         datePickerDialog.show();
@@ -226,5 +306,39 @@ public class List extends AppCompatActivity {
         arrayList=databaseHelper.getAllList(sortList);
         adapterList = new AdapterList(this,arrayList);
         listView.setAdapter(adapterList);
+    }
+
+    void sort() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        String[] choice = {"Data dodania", "Godzina", "Osoba", "Miejsce"};
+
+        builder.setTitle("Sortuj według").setItems(choice, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which) {
+                    case 0:
+                        sortList = 0;
+                        break;
+                    case 1:
+                        sortList = 1;
+                        break;
+                    case 2:
+                        sortList = 2;
+                        break;
+                    case 3:
+                        sortList = 3;
+                        break;
+                }
+                setOrder();
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    void setOrder(){
+        savePreferences();
+        adapterList.swapItems(databaseHelper.getAllList(sortList));
     }
 }

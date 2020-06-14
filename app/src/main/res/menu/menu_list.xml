@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/menuPlus"
+        android:icon="@drawable/ic_dodaj"
+        android:title="@string/menu_add"
+        app:showAsAction="ifRoom"/>
+
+    <item android:id="@+id/menuSort"
+        android:icon="@drawable/menu_sort"
+        android:title="@string/menu_sort"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/menuClear"
+        android:icon="@drawable/menu_clear"
+        android:title="@string/menu_clear"
+        app:showAsAction="never" />
+</menu>
