@@ -22,7 +22,7 @@ Project is created with:
 
 
 ## Features
-List of features ready
+List of features:
 * Two lists - list with data and list with templates
 * Adding, editing and deleting records from list with data
 * Adding records to list with templates
